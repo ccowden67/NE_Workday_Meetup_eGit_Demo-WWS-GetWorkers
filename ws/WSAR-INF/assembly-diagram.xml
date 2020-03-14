@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wdnm:Diagram xmlns:wdnm="http://workday.com/studio/editors/notation">
+  <element href="assembly.xml#WorkdayAssembly"/>
+  <visualProperties x="124" y="101">
+    <element href="assembly.xml#StartHere"/>
+  </visualProperties>
+  <visualProperties x="230" y="131">
+    <element href="assembly.xml#AsyncMediation"/>
+  </visualProperties>
+  <visualProperties x="376" y="127">
+    <element href="assembly.xml#PagedGet"/>
+  </visualProperties>
+  <visualProperties x="81" y="504">
+    <element href="assembly.xml#ProcessGetWorkers"/>
+  </visualProperties>
+  <visualProperties x="248" y="415">
+    <element href="assembly.xml#Splitter"/>
+  </visualProperties>
+  <visualProperties x="388" y="408">
+    <element href="assembly.xml#Transform_XML-to-CSV"/>
+  </visualProperties>
+  <visualProperties x="574" y="447">
+    <element href="assembly.xml#Aggregator"/>
+  </visualProperties>
+  <visualProperties x="85" y="826">
+    <element href="assembly.xml#StoreAndSendData"/>
+  </visualProperties>
+  <visualProperties x="672" y="500">
+    <element href="assembly.xml#StoreAndSendData0"/>
+  </visualProperties>
+  <visualProperties x="241" y="768">
+    <element href="assembly.xml#AsyncMediation1"/>
+  </visualProperties>
+  <visualProperties x="411" y="783">
+    <element href="assembly.xml#PutIntegrationMessage"/>
+  </visualProperties>
+  <connections type="routesTo" sourceAnchorX="0.7798165137614679" sourceAnchorY="1.0" targetAnchorX="0.18110236220472442" targetAnchorY="0.1956521739130435">
+    <source href="assembly.xml#StartHere"/>
+    <target href="assembly.xml#AsyncMediation"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="1.0" sourceAnchorY="0.2765957446808511" targetAnchorX="0.4375" targetAnchorY="0.35135135135135137">
+    <source href="assembly.xml#AsyncMediation"/>
+    <target href="assembly.xml#PagedGet"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="0.7261904761904762" sourceAnchorY="1.0" targetAnchorX="0.32710280373831774" targetAnchorY="0.13333333333333333">
+    <source href="assembly.xml#ProcessGetWorkers"/>
+    <target href="assembly.xml#Splitter"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="1.0" sourceAnchorY="0.7352941176470589" targetAnchorX="0.29850746268656714" targetAnchorY="0.32608695652173914">
+    <source href="assembly.xml#//@beans/@mixed.1/@splitter.0/@subRoute.0"/>
+    <target href="assembly.xml#Transform_XML-to-CSV"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="1.0" sourceAnchorY="0.1702127659574468" targetAnchorX="0.4215686274509804" targetAnchorY="0.32432432432432434">
+    <source href="assembly.xml#Transform_XML-to-CSV"/>
+    <target href="assembly.xml#Aggregator"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="1.0" sourceAnchorY="0.16037735849056603" targetAnchorX="0.46745562130177515" targetAnchorY="0.5675675675675675">
+    <source href="assembly.xml#Aggregator"/>
+    <target href="assembly.xml#StoreAndSendData0"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="0.8209876543209876" sourceAnchorY="1.0" targetAnchorX="0.4253731343283582" targetAnchorY="0.24468085106382978">
+    <source href="assembly.xml#StoreAndSendData"/>
+    <target href="assembly.xml#AsyncMediation1"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="1.0" sourceAnchorY="0.20212765957446807" targetAnchorX="0.358695652173913" targetAnchorY="0.43243243243243246">
+    <source href="assembly.xml#AsyncMediation1"/>
+    <target href="assembly.xml#PutIntegrationMessage"/>
+  </connections>
+  <swimlanes x="59" y="24" font="Arial|9|0" fontColor="1" name="Get-Data-WWS-GetWorkers" description="Creating a Get_Workers SOAP API request and triggering the request using the PagedGet comonent." topBorderColor="8421631">
+    <elements href="assembly.xml#StartHere"/>
+    <elements href="assembly.xml#AsyncMediation"/>
+    <elements href="assembly.xml#PagedGet"/>
+  </swimlanes>
+  <swimlanes x="59" y="223" name="ProcessingData" description="Splitting the WWS response xml into individual records, transforming the data and during the aggregation, adding a header and footer line to the result document." topBorderColor="8454143">
+    <elements href="assembly.xml#ProcessGetWorkers"/>
+    <elements href="assembly.xml#Splitter"/>
+    <elements href="assembly.xml#Transform_XML-to-CSV"/>
+    <elements href="assembly.xml#Aggregator"/>
+    <elements href="assembly.xml#StoreAndSendData0"/>
+  </swimlanes>
+  <swimlanes x="59" y="469" name="Store/Send-Data" description="Storing and sending the data with a PutIntegrationMessage WWS to the integration event." topBorderColor="8454016">
+    <elements href="assembly.xml#StoreAndSendData"/>
+    <elements href="assembly.xml#AsyncMediation1"/>
+    <elements href="assembly.xml#PutIntegrationMessage"/>
+  </swimlanes>
+</wdnm:Diagram>

@@ -1,0 +1,39 @@
+# Created by https://www.gitignore.io/api/java,eclipse
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+.settings/
+.loadpath
+.project
+target/
+# External tool builders
+.externalToolBuilders/
+# Locally stored "Eclipse launch configurations"
+*.launch
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+# sbteclipse plugin
+.target
+# STS (Spring Tool Suite)
+.springBeans
+### Java ###
+*.class
+# Package Files #
+*.jar
+*.war
+*.ear
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+# miscellaneous
+log/
+.idea/
+*.log
+*.orig
+.idea/
+.vscode/
+*.stackdump
+/build/

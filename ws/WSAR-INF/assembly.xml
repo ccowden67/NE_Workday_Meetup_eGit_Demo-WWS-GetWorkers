@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:cc="http://www.capeclear.com/assembly/10" xmlns:cloud="urn:com.workday/esb/cloud/10.0" xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pi="urn:com.workday/picof" xmlns:wd="urn:com.workday/bsvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ 
+	<cc:assembly id="WorkdayAssembly" version="2018.35">
+        <cc:workday-in id="StartHere" routes-to="AsyncMediation">
+            <cc:integration-system name="NE_Workday_Meetup_eGit_Demo-WWS-GetWorkers"/>
+        </cc:workday-in>
+        <cc:async-mediation id="AsyncMediation" routes-to="PagedGet">
+            <cc:steps>
+                <cc:write id="CreateGetWorkersRequest">
+                    <cc:message>
+                        <cc:text>&lt;?xml version=&quot;1.0&quot; ?>&#xD;
+&lt;env:Envelope xmlns:env=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;>&#xD;
+    &lt;env:Body>&#xD;
+        &lt;wd:Get_Workers_Request xmlns:wd=&quot;urn:com.workday/bsvc&quot; wd:version=&quot;v31.2&quot;>&#xD;
+            &lt;wd:Response_Filter>&#xD;
+                &lt;wd:Page>1&lt;/wd:Page>&#xD;
+                &lt;wd:Count>3&lt;/wd:Count>&#xD;
+            &lt;/wd:Response_Filter>&#xD;
+            &lt;wd:Response_Group>&#xD;
+                &lt;wd:Include_Personal_Information>true&lt;/wd:Include_Personal_Information>&#xD;
+                &lt;wd:Include_Employment_Information>true&lt;/wd:Include_Employment_Information>&#xD;
+                &lt;wd:Include_Qualifications>true&lt;/wd:Include_Qualifications>&#xD;
+            &lt;/wd:Response_Group>&#xD;
+        &lt;/wd:Get_Workers_Request>&#xD;
+    &lt;/env:Body>&#xD;
+&lt;/env:Envelope></cc:text>
+                    </cc:message>
+                </cc:write>
+                <cc:eval id="Eval">
+                    <cc:expression>props['pCounter'] = 0</cc:expression>
+                </cc:eval>
+            </cc:steps>
+        </cc:async-mediation>
+        <cc:local-out id="PagedGet" endpoint="vm://wcc/PagedGet">
+<cc:set name="is.paged.get.request.current.page.xpath" value="'/env:Envelope/env:Body/*/wd:Response_Filter/wd:Page'"/>
+<cc:set name="is.paged.get.response.current.page.xpath" value="'/env:Envelope/env:Body/*/wd:Response_Results/wd:Page'"/>
+<cc:set name="is.paged.get.response.total.pages.xpath" value="'/env:Envelope/env:Body/*/wd:Response_Results/wd:Total_Pages'"/>
+<cc:set name="is.paged.get.response.total.results.xpath" value="'/env:Envelope/env:Body/*/wd:Response_Results/wd:Total_Results'"/>
+<cc:set name="is.paged.get.application" value="'Human_Resources'"/>
+<cc:set name="is.paged.get.version" value="'v31.2'"/>
+<cc:set name="is.paged.get.page.zero" value="false"/>
+<cc:set name="is.paged.get.store.requests" value="true"/>
+<cc:set name="is.paged.get.process.endpoint" value="'vm://NE_Workday_Meetup_eGit_Demo-WWS-GetWorkers/ProcessGetWorkers'"/>
+</cc:local-out>
+        <cc:local-in id="ProcessGetWorkers" routes-to="Splitter"/>
+        <cc:splitter id="Splitter">
+            <cc:sub-route name="SubRoute" routes-to="Transform_XML-to-CSV"/>
+            <cc:xml-stream-splitter xpath="/env:Envelope/env:Body/wd:Get_Workers_Response/wd:Response_Data/wd:Worker"/>
+        </cc:splitter>
+        <cc:async-mediation id="Transform_XML-to-CSV" routes-to="Aggregator">
+            <cc:steps>
+                <cc:log id="LogResults">
+                    <cc:log-message>
+                        <cc:message-content/>
+                    </cc:log-message>
+                </cc:log>
+                <cc:xslt-plus id="XsltPlus" url="Transform.xsl"/>
+                <cc:xml-to-csv id="XmlToCsv"/>
+                <cc:eval id="Eval">
+                    <cc:expression>props['pCounter'] = props['pCounter'] + 1</cc:expression>
+                </cc:eval>
+            </cc:steps>
+        </cc:async-mediation>
+        <cc:aggregator id="Aggregator" routes-to="StoreAndSendData0" force-batch-on-last-message="false" force-batch-when="props['is.paged.get.last.page'] &amp;&amp; util.isLastMessageInBatch()">
+            <cc:size-batch-strategy batch-size="-1"/>
+            <cc:message-content-collater>
+        <cc:header-text>Employee ID,First Name,Last Name,Gender,Birth Date,&#xD;
+</cc:header-text>
+        <cc:footer-text>Processed @{props['pCounter']} records.</cc:footer-text>
+      </cc:message-content-collater>
+        </cc:aggregator>
+        <cc:local-in id="StoreAndSendData" routes-to="AsyncMediation1"/>
+        <cc:local-out id="StoreAndSendData0" endpoint="vm://NE_Workday_Meetup_eGit_Demo-WWS-GetWorkers/StoreAndSendData"/>
+        <cc:async-mediation id="AsyncMediation1" routes-to="PutIntegrationMessage">
+            <cc:steps>
+                <cc:store id="Store" output="variable" output-variable="vStoredData" createDocumentReference="false" title="WorkerOutput.csv"/>
+            </cc:steps>
+        </cc:async-mediation>
+        <cc:local-out id="PutIntegrationMessage" endpoint="vm://wcc/PutIntegrationMessage">
+<cc:set name="is.message.severity" value="'INFO'"/>
+<cc:set name="is.message.summary" value="'Sending an output file to the integration event.'"/>
+<cc:set name="is.message.storage.enabled" value="false"/>
+<cc:set name="is.document.variable.name" value="'vStoredData'"/>
+</cc:local-out>
+	</cc:assembly>
+
+</beans>
